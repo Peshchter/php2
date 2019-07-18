@@ -1,19 +1,174 @@
 <?php
 namespace App\services;
-
-use App\models\CalcRows;
-
-class BD implements IBD, IBD2
+use App\models\Model;
+use App\traits\TSingleton;
+class BD implements IBD
 {
-    use CalcRows;
+    use TSingleton;
 
-    public function find(string $sql)
+    private $config = [
+        'user' => 'root',
+        'pass' => '',
+        'driver' => 'mysql',
+        'bd' => 'lessons',
+        'host' => 'localhost',
+        'charset' => 'UTF8',
+    ];
+
+    /**
+     * @var \PDO|null
+     */
+    protected $connect = null;
+
+    /**
+     * Возвращает только один коннект с базой - объект PDO
+     * @return \PDO|null
+     */
+    protected function getConnect()
     {
-        echo $sql;
+        if (empty($this->connect)) {
+            $this->connect = new \PDO(
+                $this->getDSN(),
+                $this->config['user'],
+                $this->config['pass']
+            );
+            $this->connect->setAttribute(
+                \PDO::ATTR_DEFAULT_FETCH_MODE,
+                \PDO::FETCH_INTO
+            );
+        }
+        return $this->connect;
     }
 
-    public function findAll(string $sql)
+    /**
+     * Создание строки - настройки для подключения
+     * @return string
+     */
+    private function getDSN()
     {
-        return $sql;
+        //'mysql:host=localhost;dbname=DB;charset=UTF8'
+        return sprintf(
+            '%s:host=%s;dbname=%s;charset=%s',
+            $this->config['driver'],
+            $this->config['host'],
+            $this->config['bd'],
+            $this->config['charset']
+        );
+    }
+
+    /**
+     * Выполнение запроса
+     *
+     * @param string $sql 'SELECT * FROM users WHERE id = :id'
+     * @param array $params [':id' => 123]
+     * @return \PDOStatement
+     */
+    private function query(string $sql, array $params = [])
+    {
+        $PDOStatement = $this->getConnect()->prepare($sql);
+        $PDOStatement->execute($params);
+        return $PDOStatement;
+    }
+
+    public function find($obj, string $sql,array $params = [])
+    {
+        $sth = $this->query($sql, $params);
+        $sth->setFetchMode(\PDO::FETCH_INTO, $obj);
+        return $sth->fetch();
+    }
+
+    /**
+     * Получение всех строк
+     *
+     * @param string $sql
+     * @param array $params
+     * @return mixed
+     */
+    public function findAll($obj, string $sql, array $params = [])
+    {
+        $sth = $this->query($sql, $params);
+        $sth->setFetchMode(\PDO::FETCH_CLASS, get_class($obj));
+        return $sth->fetchAll();
+    }
+
+
+    /**
+     * Выполнение безответного запроса
+     *
+     * @param string $sql
+     * @param array $params
+     */
+    public function execute(string $sql, array $params = [])
+    {
+        $this->query($sql, $params);
+    }
+
+    public function save( $obj, $table)
+    {
+        $temp = $this->query("SELECT * FROM {$table} WHERE name = :name", [':name'=>$obj->name]);
+        $temp->setFetchMode(\PDO::FETCH_CLASS, get_class($obj));
+        if($temp->fetch())
+        {
+            $this->update($obj, $table, $obj->id);
+  //          echo "updating";
+
+        }else {
+            $this->insert($obj, $table);
+  //          echo "inserting";
+        }
+
+    }
+
+    private function update($obj, $table, $id)
+    {
+        $string = '';
+        foreach ($obj as $name => $value ){
+            if($name != 'id') {
+                $string .= "{$name}='{$value}', ";
+                }
+        }
+        $string  = substr($string, 0, -2);
+        $sql = "UPDATE {$table} SET {$string} WHERE id = {$id}";
+   //     echo $sql;
+        $this->query($sql);
+    }
+    private function insert($obj, $table)
+    {
+        $names = "";
+        $values = "";
+        foreach ($obj as $name => $value ){
+            if($name != 'id') {
+                $names .= $name.", ";
+                $values.= "'{$value}', ";}
+        }
+        $names  = substr($names, 0, -2);
+        $values  = substr($values, 0, -2);
+        $sql = "INSERT INTO {$table} ({$names}) VALUES ({$values})";
+        $this->query($sql);
+
+    }
+
+    /**
+     *      * @param string $table
+     */
+    public function delete($obj, string $table)
+    {
+        $sql = "DELETE FROM {$table} WHERE id = :id";
+        $this->query($sql, [':id' => $obj->id]);
+    }
+
+    public function testAdd($obj)
+    {
+        $names = "";
+        $values = "";
+        foreach ($obj as $name => $value ){
+            if($name != 'id') {
+            $names .= $name.", ";
+            $values.= "'{$value}', ";}
+        }
+        $names  = substr($names, 0, -2);
+        $values  = substr($values, 0, -2);
+        $sql = "INSERT INTO users ({$names}) VALUES ({$values})";
+        $this->query($sql);
     }
 }

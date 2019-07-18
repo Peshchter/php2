@@ -3,7 +3,6 @@
 include '../services/Autoload.php';
 
 use App\models\User;
-use App\models\Good;
 use App\services\BD;
 
 spl_autoload_register(
@@ -11,12 +10,18 @@ spl_autoload_register(
         'loadClass']
 );
 
-$user = new User(new BD());
+$user = new User();
+$user->getOne(1);
+//var_dump( $user);
 
-$user->getOne(12);
-$good = (new Good(new BD()))->getAll();
+$users = $user->getAll();
 
-var_dump($good);
-var_dump($user->calc([1,15,456,456]));
+$user2 = new User();
+$user2->getOne(5);
+$user2->login = 'RGFIGsa2323';
+
+
+$user2->save();
+//include 'form.html';
 
 

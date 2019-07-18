@@ -10,9 +10,12 @@ abstract class Model
      */
     protected $bd;
 
-    public function __construct( $bd)
+    /**
+     * Model constructor.
+     */
+    public function __construct()
     {
-        $this->bd = $bd;
+        $this->bd = BD::getInstance();
     }
 
     /**
@@ -30,10 +33,9 @@ abstract class Model
     public function getOne($id)
     {
         $tableName = $this->getTableName();
-        $sql = "SELECT * FROM {$tableName} WHERE id = {$id}";
-        $this->bd->find($sql);
-        return [];
-    }
+        $sql = "SELECT * FROM {$tableName} WHERE id = :id";
+        return $this->bd->find($this, $sql, [':id' => $id]);
+}
 
     /**
      *
@@ -41,7 +43,22 @@ abstract class Model
     public function getAll()
     {
         $tableName = $this->getTableName();
-        $sql = "SELECT * FROM $tableName";
-        return $this->bd->findAll($sql);
+        $sql = "SELECT * FROM {$tableName}";
+        return $this->bd->findAll($this, $sql);
+    }
+
+    public function save()
+    {
+        $this->bd->save($this, $this->getTableName());
+    }
+
+    public function delete()
+    {
+        $this->bd->delete($this, $this->getTableName());
+    }
+
+    public function test()
+    {
+        $this->bd->testAdd($this);
     }
 }
