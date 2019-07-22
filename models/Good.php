@@ -5,11 +5,12 @@ class Good extends Model
 {
     public $id;
     public $price;
-    public $name;
+    public $title;
     public $info;
+    public $img;
 
-    protected function getTableName()
+    protected static function getTableName()
     {
-        return 'goods';
+        return 'products';
     }
 }

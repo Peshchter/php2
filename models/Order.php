@@ -48,7 +48,7 @@ class Order extends Model
 
 
 
-    protected function getTableName()
+    protected static function getTableName()
     {
         return 'orders';
     }

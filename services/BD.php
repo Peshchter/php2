@@ -2,7 +2,7 @@
 namespace App\services;
 use App\models\Model;
 use App\traits\TSingleton;
-class BD implements IBD
+class BD
 {
     use TSingleton;
 
@@ -70,25 +70,25 @@ class BD implements IBD
         return $PDOStatement;
     }
 
-    public function find($obj, string $sql,array $params = [])
+    public function find(string $class, string $sql,array $params = [])
     {
-        $sth = $this->query($sql, $params);
-        $sth->setFetchMode(\PDO::FETCH_INTO, $obj);
-        return $sth->fetch();
+        $PDOStatement = $this->query($sql, $params);
+        $PDOStatement->setFetchMode(\PDO::FETCH_CLASS, $class);
+        return $PDOStatement->fetch();
     }
 
     /**
      * Получение всех строк
-     *
+     * @param string $class
      * @param string $sql
      * @param array $params
      * @return mixed
      */
-    public function findAll($obj, string $sql, array $params = [])
+    public function findAll(string $class, string $sql, array $params = [])
     {
-        $sth = $this->query($sql, $params);
-        $sth->setFetchMode(\PDO::FETCH_CLASS, get_class($obj));
-        return $sth->fetchAll();
+        $PDOStatement = $this->query($sql, $params);
+        $PDOStatement->setFetchMode(\PDO::FETCH_CLASS, $class);
+        return $PDOStatement->fetchAll();
     }
 
 
@@ -97,78 +97,59 @@ class BD implements IBD
      *
      * @param string $sql
      * @param array $params
+     * @return \PDOStatement
      */
     public function execute(string $sql, array $params = [])
     {
-        $this->query($sql, $params);
+        return $this->query($sql, $params);
     }
 
-    public function save( $obj, $table)
+    public function lastID()
     {
-        $temp = $this->query("SELECT * FROM {$table} WHERE name = :name", [':name'=>$obj->name]);
-        $temp->setFetchMode(\PDO::FETCH_CLASS, get_class($obj));
-        if($temp->fetch())
-        {
-            $this->update($obj, $table, $obj->id);
-  //          echo "updating";
-
-        }else {
-            $this->insert($obj, $table);
-  //          echo "inserting";
-        }
-
+        return $this->getConnect()->lastInsertId();
     }
 
-    private function update($obj, $table, $id)
-    {
-        $string = '';
-        foreach ($obj as $name => $value ){
-            if($name != 'id') {
-                $string .= "{$name}='{$value}', ";
-                }
-        }
-        $string  = substr($string, 0, -2);
-        $sql = "UPDATE {$table} SET {$string} WHERE id = {$id}";
-   //     echo $sql;
-        $this->query($sql);
-    }
-    private function insert($obj, $table)
-    {
-        $names = "";
-        $values = "";
-        foreach ($obj as $name => $value ){
-            if($name != 'id') {
-                $names .= $name.", ";
-                $values.= "'{$value}', ";}
-        }
-        $names  = substr($names, 0, -2);
-        $values  = substr($values, 0, -2);
-        $sql = "INSERT INTO {$table} ({$names}) VALUES ({$values})";
-        $this->query($sql);
-
-    }
-
-    /**
-     *      * @param string $table
-     */
-    public function delete($obj, string $table)
-    {
-        $sql = "DELETE FROM {$table} WHERE id = :id";
-        $this->query($sql, [':id' => $obj->id]);
-    }
-
-    public function testAdd($obj)
-    {
-        $names = "";
-        $values = "";
-        foreach ($obj as $name => $value ){
-            if($name != 'id') {
-            $names .= $name.", ";
-            $values.= "'{$value}', ";}
-        }
-        $names  = substr($names, 0, -2);
-        $values  = substr($values, 0, -2);
-        $sql = "INSERT INTO users ({$names}) VALUES ({$values})";
-        $this->query($sql);
-    }
+//    public function save( $obj, $table)
+//    {
+//        $temp = $this->query("SELECT * FROM {$table} WHERE name = :name", [':name'=>$obj->name]);
+//        $temp->setFetchMode(\PDO::FETCH_CLASS, get_class($obj));
+//        if($temp->fetch())
+//        {
+//            $this->update($obj, $table, $obj->id);
+//  //          echo "updating";
+//
+//        }else {
+//            $this->insert($obj, $table);
+//  //          echo "inserting";
+//        }
+//
+//    }
+//
+//    private function update($obj, $table, $id)
+//    {
+//        $string = '';
+//        foreach ($obj as $name => $value ){
+//            if($name != 'id') {
+//                $string .= "{$name}='{$value}', ";
+//                }
+//        }
+//        $string  = substr($string, 0, -2);
+//        $sql = "UPDATE {$table} SET {$string} WHERE id = {$id}";
+//   //     echo $sql;
+//        $this->query($sql);
+//    }
+//    private function insert($obj, $table)
+//    {
+//        $names = "";
+//        $values = "";
+//        foreach ($obj as $name => $value ){
+//            if($name != 'id') {
+//                $names .= $name.", ";
+//                $values.= "'{$value}', ";}
+//        }
+//        $names  = substr($names, 0, -2);
+//        $values  = substr($values, 0, -2);
+//        $sql = "INSERT INTO {$table} ({$names}) VALUES ({$values})";
+//        $this->query($sql);
+//    }
 }
