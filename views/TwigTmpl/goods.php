@@ -15,6 +15,7 @@
                 <h1> {{ good.title }} </h1>
                 <h3 class="price">{{ good.price }} руб. </h3>
                 <p> {{ good.info }}  </p>
+                <a href="/good/delete/?id={{good.id}}">Удалить</a>
             </div>
         </a>
     {%endfor%}

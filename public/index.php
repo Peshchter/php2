@@ -6,6 +6,8 @@ $request = new \App\services\Request();
 $controllerName = $request->getControllerName() ?: 'good';
 $actionName = $request->getActionName();
 
+//var_dump();
+
 $controllerClass = 'App\\controllers\\' .
     ucfirst($controllerName) . 'Controller';
 

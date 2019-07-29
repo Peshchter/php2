@@ -38,15 +38,27 @@ class GoodController extends Controller
 
     public function insertAction()
     {
+
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $gRepo = new GoodRepository();
             $good = new Good();
             $good->price = $_POST['price'];
             $good->title = $_POST['title'];
             $good->info = $_POST['info'];
-            $good->save();
+            $good->id = $_POST['id'];
+            $gRepo->save($good);
             header('Location: /good/goods');
             exit;
         }
+
+        if ($_REQUEST['id']) {
+            $gRepo = new GoodRepository();
+            $good = $gRepo->getOne((int)$_REQUEST['id']);
+            echo $this->render('goodInsert', ['good'=>$good]);
+            exit;
+        }
+
         echo $this->render('goodInsert', []);
     }
 

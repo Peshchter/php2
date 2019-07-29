@@ -12,5 +12,6 @@
         <h1> {{ good.title }} </h1>
         <h3 class="price">{{ good.price }} руб. </h3>
         <p> {{ good.info }}  </p>
+        <a href="/good/insert/?id={{good.id}}">Изменить</a>
     </div>
 </div>

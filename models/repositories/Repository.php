@@ -67,24 +67,26 @@ abstract class Repository
     {
         $columns = [];
         $params = [];
-        $values = [];
+      //  $values = [];
 
         foreach ($entity as $key => $value) {
             if ($key == 'bd' || $key == 'id') {
                 continue;
             }
             $columns[] = $key;
-            $params[":{$key}"] = $value;
-            $values[] = $value;
+            $params[":{$key}"] = $value ?: 'null';
+        //    $values[] = $value ?: null;
         }
 
         $columnsString = implode(', ', $columns);
         $placeholders = implode(', ', array_keys($params));
-        $valuestring = implode(', ', $values);
+       // $valuestring = implode(" ', '", $values);
+       // $valuestring = "'". $valuestring . "'";
         $tableName = $this->getTableName();
-        $sql = "INSERT INTO {$tableName} ({$columnsString}) VALUES ({$valuestring})";
+       // $this->id = $this->bd->lastInsertId();
+        $sql = "INSERT INTO {$tableName} ({$columnsString}) VALUES ({$placeholders})";
         $this->bd->execute($sql, $params);
-        //$this->id = $this->bd->lastInsertId();
+       // $this->id = $this->bd->lastID();
     }
 
     protected function update($entity)
