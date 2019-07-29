@@ -5,9 +5,11 @@
  */
 ?>
 
+<div class="insert"><a href="/good/insert">Добавить</a></div>
+
 <div class="goods_block" style="display: flex; flex-direction: row; flex-wrap: wrap;">
     {% for good in goods %}
-        <a href="?a=good&id={{good.id}}">
+        <a href="/good/good/?id={{good.id}}">
             <div class="good_block"
                  style="display:flex; flex-direction: column;border: black 1px solid; margin: 10px;">
                 <h1> {{ good.title }} </h1>

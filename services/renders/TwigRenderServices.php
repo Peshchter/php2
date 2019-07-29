@@ -9,7 +9,9 @@ class TwigRenderServices implements IRenderService
 
     public function __construct()
     {
-        $loader = new \Twig\Loader\FilesystemLoader('../views/TwigTmpl');
+        $loader = new \Twig\Loader\FilesystemLoader(
+            '../views/TwigTmpl'
+            );
         $this->twig = new \Twig\Environment($loader);
     }
 

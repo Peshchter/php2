@@ -5,7 +5,7 @@
  */
 
 ?>
-<a href="?a=goods">Весь список</a>
+<a href="/good/goods/">Весь список</a>
 <div class="" style="display: flex;">
     <div class="good_block"
          style="display:flex; flex-direction: column;border: black 1px solid; margin: 10px;">

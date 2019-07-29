@@ -1,7 +1,8 @@
 <?php
 namespace App\controllers;
 
-use App\models\User;
+use App\models\entities\User;
+use App\models\repositories\UserRepository;
 
 class UserController extends Controller
 {
@@ -23,5 +24,28 @@ class UserController extends Controller
         ];
 
         echo $this->render('users', $params);
+    }
+
+    public function deleteAction()
+    {
+        $id = $this->getId();
+        $userRepository = new UserRepository();
+        $user = $userRepository->getOne($id);
+        $userRepository->delete($user);
+        header('Location: ?a=users');
+    }
+
+    public function insertAction()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $user = new User();
+            $user->fio = $_POST['fio'];
+            $user->login = $_POST['login'];
+            $user->password = $_POST['password'];
+            $user->save();
+            header('Location: ?a=users');
+            exit;
+        }
+        echo $this->render('userInsert', []);
     }
 }
