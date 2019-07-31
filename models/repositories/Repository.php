@@ -2,6 +2,7 @@
 
 namespace App\models\repositories;
 
+use App\main\App;
 use App\models\entities\Entity;
 use App\services\BD;
 
@@ -23,7 +24,7 @@ abstract class Repository
      */
     public function __construct()
     {
-        $this->bd = BD::getInstance();
+        $this->bd = App::call()->bd;
     }
 
     /**
@@ -44,8 +45,8 @@ abstract class Repository
     {
         $tableName = $this->getTableName();
         $sql = "SELECT * FROM {$tableName} WHERE id = :id";
-        return BD::getInstance()->find(
-            get_called_class(),
+        return $this->bd->find(
+            $this->getEntityName(),
             $sql,
             [':id' => $id]);
     }
@@ -67,26 +68,18 @@ abstract class Repository
     {
         $columns = [];
         $params = [];
-      //  $values = [];
-
         foreach ($entity as $key => $value) {
             if ($key == 'bd' || $key == 'id') {
                 continue;
             }
             $columns[] = $key;
             $params[":{$key}"] = $value ?: 'null';
-        //    $values[] = $value ?: null;
         }
-
         $columnsString = implode(', ', $columns);
         $placeholders = implode(', ', array_keys($params));
-       // $valuestring = implode(" ', '", $values);
-       // $valuestring = "'". $valuestring . "'";
         $tableName = $this->getTableName();
-       // $this->id = $this->bd->lastInsertId();
         $sql = "INSERT INTO {$tableName} ({$columnsString}) VALUES ({$placeholders})";
         $this->bd->execute($sql, $params);
-       // $this->id = $this->bd->lastID();
     }
 
     protected function update($entity)

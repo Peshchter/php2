@@ -5,14 +5,12 @@ class BD
 {
     use TSingleton;
 
-    private $config = [
-        'user' => 'root',
-        'pass' => '',
-        'driver' => 'mysql',
-        'bd' => 'lessons',
-        'host' => 'localhost',
-        'charset' => 'UTF8',
-    ];
+    private $config;
+
+    public function __construct($config)
+    {
+        $this->config = $config;
+    }
 
     /**
      * @var \PDO|null

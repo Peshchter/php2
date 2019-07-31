@@ -1,6 +1,7 @@
 <?php
 namespace App\controllers;
 
+use App\main\App;
 use App\models\entities\User;
 use App\models\repositories\UserRepository;
 
@@ -10,17 +11,17 @@ class UserController extends Controller
 
     public function userAction()
     {
+        $id = $this->getId();
         $params = [
-            'user' => User::getOne(1)
+            'user' => App::call()->userRepository->getOne($id)
         ];
-
         echo $this->render('user', $params);
     }
 
     public function usersAction()
     {
         $params = [
-            'users' => User::getAll()
+            'users' => App::call()->userRepository->getAll()
         ];
 
         echo $this->render('users', $params);
@@ -29,10 +30,9 @@ class UserController extends Controller
     public function deleteAction()
     {
         $id = $this->getId();
-        $userRepository = new UserRepository();
-        $user = $userRepository->getOne($id);
-        $userRepository->delete($user);
-        header('Location: ?a=users');
+        $user = App::call()->userRepository->getOne($id);
+        App::call()->userRepository->delete($user);
+        return $this->redirect();
     }
 
     public function insertAction()
@@ -42,10 +42,52 @@ class UserController extends Controller
             $user->fio = $_POST['fio'];
             $user->login = $_POST['login'];
             $user->password = $_POST['password'];
-            $user->save();
-            header('Location: ?a=users');
-            exit;
+            App::call()->userRepository->save($user);
+            return $this->redirect();
         }
         echo $this->render('userInsert', []);
     }
+
+    public function signInAction()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+            $login = $_POST['login'];
+            $password = $_POST['password'];
+            $user = App::call()->userRepository->getUserByLogin($login);
+            if  ( password_verify($password, $user->password) ) {
+                $this->request->setSession('is_Auth', true);
+                $this->request->setSession('user_id', $user->id);
+            }
+            return $this->redirect('/good');
+        }
+
+        echo $this->render('signIn', []);
+
+    }
+
+    public function signOutAction()
+    {
+        $this->request->setSession('is_Auth', false);
+        unset($_SESSION['user_id']);
+        return $this->redirect();
+    }
+
+    public function regAction()
+    {
+        if (($_SERVER['REQUEST_METHOD'] == 'POST') && ($_POST['password'] == $_POST['password2'])) {
+            $user = new User();
+            $user->name = $_POST['name'];
+            $user->login = $_POST['login'];
+            $user->password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            App::call()->userRepository->save($user);
+            $user_id = App::call()->bd->lastID();
+            $this->request->setSession('is_Auth', true);
+            $this->request->setSession('user_id', $user_id);
+            return $this->redirect('/good');
+
+        }
+        echo $this->render('userReg', []);
+    }
+
 }

@@ -6,6 +6,7 @@ use App\models\entities\Good;
 /**
  * Class GoodRepository
  * @package App\models
+ * @method Good getOne($id)
  */
 class GoodRepository extends Repository
 {
