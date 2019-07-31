@@ -2,6 +2,7 @@
 namespace App\controllers;
 
 use App\services\renders\IRenderService;
+use App\services\Request;
 
 abstract class Controller
 {
@@ -9,10 +10,12 @@ abstract class Controller
     protected $action;
     protected $id;
     protected $renderer;
+    protected $request;
 
-    public function __construct(IRenderService $renderer)
+    public function __construct(IRenderService $renderer, Request $request)
     {
         $this->renderer = $renderer;
+        $this->request = $request;
     }
 
     public function run($action)
@@ -28,14 +31,11 @@ abstract class Controller
 
     public function render($template, $params = [])
     {
-        $content = $this->renderTmpl($template, $params);
-        return $this->renderTmpl('layouts/main', [
-            'content' => $content
-        ]);
+        return $this->renderer->renderTmpl($template, $params);
     }
 
-    public function renderTmpl($template, $params = [])
+    protected function getId()
     {
-        return $this->renderer->renderTmpl($template, $params);
+        return $this->request->getId();
     }
 }

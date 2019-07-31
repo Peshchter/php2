@@ -1,6 +1,5 @@
 <?php
 namespace App\services;
-use App\models\Model;
 use App\traits\TSingleton;
 class BD
 {
@@ -97,7 +96,7 @@ class BD
      *
      * @param string $sql
      * @param array $params
-     * @return \PDOStatement
+     *
      */
     public function execute(string $sql, array $params = [])
     {
@@ -108,48 +107,4 @@ class BD
     {
         return $this->getConnect()->lastInsertId();
     }
-
-//    public function save( $obj, $table)
-//    {
-//        $temp = $this->query("SELECT * FROM {$table} WHERE name = :name", [':name'=>$obj->name]);
-//        $temp->setFetchMode(\PDO::FETCH_CLASS, get_class($obj));
-//        if($temp->fetch())
-//        {
-//            $this->update($obj, $table, $obj->id);
-//  //          echo "updating";
-//
-//        }else {
-//            $this->insert($obj, $table);
-//  //          echo "inserting";
-//        }
-//
-//    }
-//
-//    private function update($obj, $table, $id)
-//    {
-//        $string = '';
-//        foreach ($obj as $name => $value ){
-//            if($name != 'id') {
-//                $string .= "{$name}='{$value}', ";
-//                }
-//        }
-//        $string  = substr($string, 0, -2);
-//        $sql = "UPDATE {$table} SET {$string} WHERE id = {$id}";
-//   //     echo $sql;
-//        $this->query($sql);
-//    }
-//    private function insert($obj, $table)
-//    {
-//        $names = "";
-//        $values = "";
-//        foreach ($obj as $name => $value ){
-//            if($name != 'id') {
-//                $names .= $name.", ";
-//                $values.= "'{$value}', ";}
-//        }
-//        $names  = substr($names, 0, -2);
-//        $values  = substr($values, 0, -2);
-//        $sql = "INSERT INTO {$table} ({$names}) VALUES ({$values})";
-//        $this->query($sql);
-//    }
 }
