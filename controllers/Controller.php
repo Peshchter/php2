@@ -38,4 +38,12 @@ abstract class Controller
     {
         return $this->request->getId();
     }
+
+    protected function redirect($path = '')
+    {
+        if (empty($path)) {
+            $path = $_SERVER['HTTP_REFERER'];
+        }
+        return header('Location:' . $path);
+    }
 }

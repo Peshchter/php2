@@ -12,6 +12,7 @@ class Request
 
     public function __construct()
     {
+        session_start();
         $this->requestString = $_SERVER['REQUEST_URI'];
         $this->parseRequest();
     }
@@ -20,13 +21,10 @@ class Request
     {
         $pattern = "#(?P<controller>\w+)[/]?(?P<action>\w+)?[/]?[?]?(?P<params>.*)#ui";
         $pos = strpos($this->requestString, "php2/public/");
-        //  var_dump($pos);
         if ($pos) {
             $this->requestString = substr($this->requestString, 13);
         }
         if (preg_match_all($pattern, $this->requestString, $matches)) {
-            //      var_dump($this->requestString);
-            //      var_dump($matches);
             $this->controllerName = $matches['controller'][0];
             $this->actionName = $matches['action'][0];
 
@@ -39,17 +37,17 @@ class Request
         }
     }
 
-    public function get($param)
+    public function get($param = '')
     {
-        if (defined($param)) {
-            return $_GET[$param] ?: null;
+        if (!empty($param)) {
+            return array_key_exists($param, $_GET) ?$_GET[$param]: null;
         } else return $_GET;
     }
 
-    public function post($param)
+    public function post($param = '')
     {
-        if (defined($param)) {
-            return $_POST[$param] ?: null;
+        if (!empty($param)) {
+            return array_key_exists($param, $_POST) ?$_POST[$param]: null;
         }else return $_POST;
     }
 
@@ -132,12 +130,20 @@ class Request
     {
         $this->params = $params;
     }
-}
 
-//class newException extends \Exception
-//{
-//    public function dumpError()
-//    {
-//        var_dump(parent::getMessage());
-//    }
-//}
+    public function getSession($key = null)
+    {
+        if (empty($key)) {
+            return $_SESSION;
+        }
+        return array_key_exists($key, $_SESSION)
+            ? $_SESSION[$key]
+            : [];
+    }
+
+    public function setSession($key, $value)
+    {
+        $_SESSION[$key] = $value;
+    }
+
+}
