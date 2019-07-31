@@ -1,12 +1,12 @@
+{% extends "layouts/main.php" %}
+{% block content %}
+<div class="insert"><a href="/good/insert">Добавить</a></div>
 <?php
 /**
  * @var array $goods
  * @var \App\models\Good $good
  */
 ?>
-
-<div class="insert"><a href="/good/insert">Добавить</a></div>
-
 <div class="goods_block" style="display: flex; flex-direction: row; flex-wrap: wrap;">
     {% for good in goods %}
         <a href="/good/good/?id={{good.id}}">
@@ -20,3 +20,4 @@
         </a>
     {%endfor%}
 </div>
+{% endblock %}

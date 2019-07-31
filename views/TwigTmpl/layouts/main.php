@@ -8,6 +8,6 @@
     <title>Document</title>
 </head>
 <body>
-    <div class="content">{{ content|raw }}</div>
+    <div class="content">{% block content %}{% endblock %}</div>
 </body>
 </html>

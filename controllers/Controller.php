@@ -31,14 +31,6 @@ abstract class Controller
 
     public function render($template, $params = [])
     {
-        $content = $this->renderTmpl($template, $params);
-        return $this->renderTmpl('layouts/main', [
-            'content' => $content
-        ]);
-    }
-
-    public function renderTmpl($template, $params = [])
-    {
         return $this->renderer->renderTmpl($template, $params);
     }
 
